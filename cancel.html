@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancel Appointment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #dc3545;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .booking-info {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .booking-info p {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .booking-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        .booking-info strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .booking-id {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .warning-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #cancelSection {
+            display: block;
+        }
+
+        #resultSection {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❌ Cancel Appointment</h1>
+            <p>We're sorry to see you go. Are you sure you want to cancel your appointment?</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div id="cancelSection">
+            <div class="booking-info">
+                <p><strong>Booking ID:</strong> <span class="booking-id" id="displayBookingId">Loading...</span></p>
+            </div>
+
+            <div class="warning-box">
+                <p><strong>⚠️ Please note:</strong> Once cancelled, you'll need to make a new booking if you change your mind. This action cannot be undone.</p>
+            </div>
+
+            <button type="button" class="btn btn-danger" id="confirmCancelBtn">
+                <span id="btnText">Yes, Cancel My Appointment</span>
+            </button>
+
+            <a href="https://elevai-sytems.github.io/Booking-Form-Demo-/" style="text-decoration: none;">
+                <button type="button" class="btn btn-secondary">
+                    No, Keep My Appointment
+                </button>
+            </a>
+        </div>
+
+        <div id="resultSection" style="text-align: center;">
+            <p style="font-size: 16px; color: #666; margin-bottom: 20px;">Your appointment has been cancelled.</p>
+            <a href="https://elevai-sytems.github.io/Booking-Form-Demo-/" style="text-decoration: none;">
+                <button type="button" class="btn btn-secondary">
+                    Book New Appointment
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // Get booking ID from URL parameter
+            var urlParams = new URLSearchParams(window.location.search);
+            var bookingId = urlParams.get('bookingId');
+
+            // Display booking ID
+            if (bookingId) {
+                document.getElementById('displayBookingId').textContent = bookingId;
+            } else {
+                document.getElementById('displayBookingId').textContent = 'Not found';
+                document.getElementById('confirmCancelBtn').disabled = true;
+                document.getElementById('confirmCancelBtn').innerHTML = 'Invalid Booking ID';
+            }
+
+            // Handle cancel confirmation
+            document.getElementById('confirmCancelBtn').addEventListener('click', function() {
+                if (!bookingId) {
+                    return;
+                }
+
+                var confirmBtn = document.getElementById('confirmCancelBtn');
+                var btnText = document.getElementById('btnText');
+                var messageDiv = document.getElementById('message');
+
+                // Disable button and show loading
+                confirmBtn.disabled = true;
+                btnText.innerHTML = '<span class="loading-spinner"></span>Cancelling...';
+
+                // Send cancellation request
+                var webhookUrl = 'https://elev0ai.app.n8n.cloud/webhook/cancel-appointment';
+
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        bookingId: bookingId
+                    })
+                })
+                .then(function(response) {
+                    return response.json().then(function(data) {
+                        return {
+                            ok: response.ok,
+                            status: response.status,
+                            data: data
+                        };
+                    });
+                })
+                .then(function(result) {
+                    if (result.ok && result.data.success) {
+                        // Success
+                        messageDiv.className = 'message success show';
+                        messageDiv.innerHTML = 
+                            '✅ <strong>Cancellation Successful!</strong><br>' +
+                            'Your appointment has been cancelled. You should receive a confirmation email and SMS shortly.';
+                        
+                        // Hide cancel section, show result section
+                        document.getElementById('cancelSection').style.display = 'none';
+                        document.getElementById('resultSection').style.display = 'block';
+                    } else {
+                        throw new Error(result.data.message || 'Cancellation failed');
+                    }
+                })
+                .catch(function(error) {
+                    // Error
+                    messageDiv.className = 'message error show';
+                    messageDiv.innerHTML = 
+                        '❌ <strong>Cancellation Failed</strong><br>' +
+                        error.message + '<br>' +
+                        'Please contact us directly or try again later.';
+                    
+                    // Re-enable button
+                    confirmBtn.disabled = false;
+                    btnText.textContent = 'Yes, Cancel My Appointment';
+                })
+                .finally(function() {
+                    // Scroll to message
+                    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
